@@ -83,8 +83,8 @@ File* PhpStreamWrapper::open(const String& filename, const String& mode,
   }
 
   if (!strcasecmp(req, "input")) {
-    auto raw_post = g_context->getRawPostData();
-    return NEWOBJ(MemFile)(raw_post.c_str(), raw_post.size());
+    auto req_body = g_context->getRequestBody();
+    return NEWOBJ(MemFile)(req_body.c_str(), req_body.size());
   }
 
   if (!strcasecmp(req, "output")) {

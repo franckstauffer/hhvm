@@ -396,6 +396,16 @@ void FastCGITransport::onHeadersComplete() {
     m_method = Method::POST;
   } else if (m_extendedMethod == "HEAD") {
     m_method = Method::HEAD;
+  } else if (m_extendedMethod == "OPTIONS"){
+    m_method = Method::OPTIONS;
+  } else if (m_extendedMethod == "PUT"){
+    m_method = Method::PUT;
+  } else if (m_extendedMethod == "DELETE"){
+    m_method = Method::DELETE;
+  } else if (m_extendedMethod == "TRACE"){
+    m_method = Method::TRACE;
+  } else if (m_extendedMethod == "CONNECT"){
+    m_method = Method::CONNECT;
   } else {
     m_method = Method::Unknown;
   }

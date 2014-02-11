@@ -51,6 +51,7 @@ public:
                                    Variant& raw_post,
                                    Variant& files,
                                    Transport *transport);
+
   static bool PrepareCookieVariable(Variant& cookie,
                                     Transport *transport);
   static void PrepareServerVariable(Variant& server,
@@ -58,6 +59,9 @@ public:
                                     const RequestURI &r,
                                     const SourceRootInfo &sri,
                                     const VirtualHost *vhost);
+
+  static void CopyRequestBodyIfNeeded(Transport *transport);
+
   static void CopyHeaderVariables(Variant& server,
                                   const HeaderMap& headers);
   static void CopyTransportParams(Variant& server,

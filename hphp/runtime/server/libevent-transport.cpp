@@ -53,20 +53,36 @@ LibEventTransport::LibEventTransport(LibEventServer *server,
     m_requestSize += 3;
     break;
   case EVHTTP_REQ_POST:
-    m_method = Transport::Method::POST;
-    m_requestSize += 4;
+    if (strcmp(m_request->ext_method, "OPTIONS")){
+      m_method = Transport::Method::OPTIONS;
+      m_requestSize += 7;
+    } else if (strcmp(m_request->ext_method, "PUT")){
+      m_method = Transport::Method::PUT;
+      m_requestSize += 3;
+    } else if (strcmp(m_request->ext_method, "DELETE")){
+      m_method = Transport::Method::DELETE;
+      m_requestSize += 6;
+    } else if (strcmp(m_request->ext_method, "TRACE")){
+      m_method = Transport::Method::TRACE;
+      m_requestSize += 5;
+    } else if (strcmp(m_request->ext_method, "CONNECT")){
+      m_method = Transport::Method::CONNECT;
+      m_requestSize += 7;
+    } else {
+      m_method = Transport::Method::POST;
+      m_requestSize += 4;
+    }
     break;
   case EVHTTP_REQ_HEAD:
     m_method = Transport::Method::HEAD;
     m_requestSize += 4;
     break;
   default:
-    assert(false);
-    m_method = Transport::Method::Unknown;
-    break;
+      m_method = Transport::Method::Unknown;
+      break;
   }
   m_extended_method = m_request->ext_method;
-
+  
   assert(m_request->input_headers);
   for (evkeyval *p = ((m_evkeyvalq*)m_request->input_headers)->tqh_first; p;
        p = p->next.tqe_next) {

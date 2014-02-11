@@ -195,6 +195,9 @@ void HttpProtocol::PrepareSystemVariables(Transport *transport,
                         r,
                         sri,
                         vhost);
+
+  CopyRequestBodyIfNeeded(transport);
+
 }
 
 void HttpProtocol::PrepareEnv(Variant& env,
@@ -266,6 +269,28 @@ void HttpProtocol::PrepareGetVariable(Variant& get,
   DecodeParameters(get,
                    r.queryString().data(),
                    r.queryString().size());
+}
+
+void HttpProtocol::CopyRequestBodyIfNeeded(Transport *transport) {
+	// For PUT Requests, Request Body Should Be Kept In the Context
+	if (transport->getMethod() == Transport::Method::PUT){
+	    bool needDelete = false;
+	    int size = 0;
+	    const void *data = transport->getPostData(size);
+		if (data && size) {
+			needDelete = read_all_post_data(transport, data, size);
+		    if (uint32_t(size) > StringData::MaxSize) {
+		      if (needDelete) {
+		        free((void*) data);
+		      }
+		    } else {
+		      auto string_data = needDelete ?
+				  String((char*)data, size, AttachString) : 
+				  String((char*)data, size, CopyString);
+		      g_context->setRequestBody(string_data);
+		    }
+		}
+	}
 }
 
 void HttpProtocol::PreparePostVariables(Variant& post,
@@ -354,7 +379,7 @@ void HttpProtocol::PreparePostVariables(Variant& post,
       auto string_data = needDelete ?
         String((char*)data, size, AttachString) :
         String((char*)data, size, CopyString);
-      g_context->setRawPostData(string_data);
+      g_context->setRequestBody(string_data);
       if (RuntimeOption::AlwaysPopulateRawPostData || ! needDelete) {
         // For literal we disregard RuntimeOption::AlwaysPopulateRawPostData
         raw_post = string_data;

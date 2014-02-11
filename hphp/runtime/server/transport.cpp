@@ -89,14 +89,17 @@ const char *Transport::getMethodName() {
   switch (getMethod()) {
   case Method::GET:  return "GET";
   case Method::HEAD: return "HEAD";
-  case Method::POST: {
-    const char *m = getExtendedMethod();
-    return m ? m : "POST";
-  }
+  case Method::POST: return "POST";
+  case Method::OPTIONS: return "OPTIONS";
+  case Method::PUT: return "PUT";
+  case Method::DELETE: return "DELETE";
+  case Method::TRACE: return "TRACE";
+  case Method::CONNECT: return "CONNECT";
   default:
     break;
   }
-  return "";
+  const char *m = getExtendedMethod();
+  return m ? m : "";
 }
 
 ///////////////////////////////////////////////////////////////////////////////
